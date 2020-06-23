@@ -26,7 +26,7 @@ def construct_graph(provinces, threshold):
         for b in (n for n in P.nodes(data=True) if n != a):
             if (a[1]['long'] - threshold < b[1]['long'] < a[1]['long'] + threshold) \
                     and (a[1]['lat'] - threshold < b[1]['lat'] < a[1]['lat'] + threshold):
-                P.add_edge(a[0], b[0])
+                P.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'])
                 print('EDGE')
                 print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
