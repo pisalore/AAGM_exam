@@ -1,6 +1,7 @@
 import json
 import networkx as nx
 import random
+import pylab as plt
 
 D1 = 0.8
 D2 = 0.08
@@ -56,3 +57,7 @@ print('P')
 P = construct_graph(json_provinces, D1)
 print('R')
 R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
+# to draw graph. TODO:use graphviz
+nx.draw(P)
+plt.show()
+
