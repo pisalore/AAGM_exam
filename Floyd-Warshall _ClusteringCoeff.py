@@ -4,6 +4,7 @@ import random
 import pylab as plt
 import math
 import numpy as np
+import scipy
 
 D1 = 0.8
 D2 = 0.08
@@ -40,7 +41,8 @@ def construct_graph(provinces, threshold):
                 print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
             # else:
-            #    graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'], weight=INF)
+            # graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'], weight=INF)
+
     return graph
 
 
@@ -64,9 +66,11 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
 # Floyd Warshall Algorithm
 def floyd_warshall(graph):
     # init a full n*n np array (n = nodes number)
-    n = graph.number_of_nodes()
-    A = np.full((n, n), INF)
-    print(A.shape)
+    A = nx.adjacency_matrix(graph)
+    print(A.todense())
+    print(A)
+
+
 
 with open('dpc-covid19-ita-province.json') as f:
     json_provinces = json.load(f)
