@@ -69,12 +69,19 @@ def floyd_warshall(graph):
     n = graph.number_of_nodes()
     # init a full n*n np array (n = nodes number)
     sparse_adj = nx.adjacency_matrix(graph, nodelist=None, weight='weight')
-    # get a full representation of adjacency matrix
+    # get a full representation of adjacency matrix - INITIALIZATION
     adj_matrix = sparse_adj.toarray()
     for i in range(n):
         for j in range(n):
             if i != j and adj_matrix[i][j] == 0:
                 adj_matrix[i][j] = INF
+    print(adj_matrix)
+
+    # Core algorithm
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
     print(adj_matrix)
 
 
