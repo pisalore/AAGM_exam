@@ -9,7 +9,7 @@ import scipy
 D1 = 0.8
 D2 = 0.08
 R_NUM_NODES = 2000
-INF = 99999999
+INF = 9999
 
 
 def euclidean_distance(x1, y1, x2, y2):
@@ -41,7 +41,7 @@ def construct_graph(provinces, threshold):
                 print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
             # else:
-            # graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'], weight=INF)
+            #     graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'], weight=INF)
 
     return graph
 
@@ -65,11 +65,17 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
 
 # Floyd Warshall Algorithm
 def floyd_warshall(graph):
+    # nodes number
+    n = graph.number_of_nodes()
     # init a full n*n np array (n = nodes number)
-    A = nx.adjacency_matrix(graph)
-    print(A.todense())
-    print(A)
-
+    sparse_adj = nx.adjacency_matrix(graph, nodelist=None, weight='weight')
+    # get a full representation of adjacency matrix
+    adj_matrix = sparse_adj.toarray()
+    for i in range(n):
+        for j in range(n):
+            if i != j and adj_matrix[i][j] == 0:
+                adj_matrix[i][j] = INF
+    print(adj_matrix)
 
 
 with open('dpc-covid19-ita-province.json') as f:
