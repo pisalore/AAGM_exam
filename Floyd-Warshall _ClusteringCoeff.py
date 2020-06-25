@@ -40,8 +40,6 @@ def construct_graph(provinces, threshold):
                                weight=euclidean_distance(a[1]['long'], a[1]['lat'], b[1]['long'], b[1]['lat']))
                 print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
-            # else:
-            #     graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'], weight=INF)
 
     return graph
 
@@ -58,8 +56,7 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
                     and (a[1]['y'] - threshold < b[1]['y'] < a[1]['y'] + threshold):
                 graph.add_edge(a[0], b[0], weight=euclidean_distance(a[1]['x'], a[1]['y'], b[1]['x'], b[1]['y']))
                 print(' x: ', a[1]['x'], 'y: ', a[1]['y'], ' x: ', b[1]['x'], 'y: ', b[1]['y'])
-            # else:
-            #    graph.add_edge(a[0], b[0], weight=INF)
+
     return graph
 
 
@@ -84,16 +81,31 @@ def floyd_warshall(graph):
                 adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
     print(adj_matrix)
 
+# global clustering coefficient
+def clustering_coefficient(graph, trials):
+    n = len(graph)
+    triangles = 0
+    nodes = graph.nodes()
+    for i in [int(random.random() * n) for i in range(trials)]:
+        nbrs = list(graph[nodes[i]])
+        if len(nbrs) < 2:
+            continue
+        u, v = random.sample(nbrs, 2)
+        if u in graph[v]:
+            triangles += 1
+    return triangles / float(trials)
+
 
 with open('dpc-covid19-ita-province.json') as f:
     json_provinces = json.load(f)
 
 print('P')
-P = construct_graph(json_provinces, D1)
+# P = construct_graph(json_provinces, D1)
 # print('R')
-# R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
+R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
 
-floyd_warshall(P)
+# floyd_warshall(P)
+floyd_warshall(R)
 # to draw graph. TODO:use graphviz
 # nx.draw(P)
 # plt.show()
