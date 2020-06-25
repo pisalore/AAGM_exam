@@ -84,9 +84,10 @@ def floyd_warshall(graph):
 
 # global clustering coefficient
 def clustering_coefficient(graph):
+    clustering_coeff_for_nodes = {}
     avg = 0
-    for node in graph.nodes():
-        neighbours = [n for n in nx.neighbors(graph, node)]
+    for node in graph.nodes()(data=True):
+        neighbours = [n for n in nx.neighbors(graph, node[0])]
         n_neighbors = len(neighbours)
         n_links = 0
         if n_neighbors > 1:
@@ -97,10 +98,13 @@ def clustering_coefficient(graph):
             n_links /= 2  # because n_links is calculated twice
             c = n_links / (0.5 * n_neighbors * (n_neighbors - 1))
             avg += c
-            print(c)
+            clustering_coeff_for_nodes[node[1]['city']] = c
+            # print(c)
         else:
-            print(0)
-    print("My clustering coefficient: ", avg / graph.number_of_nodes())
+            clustering_coeff_for_nodes[node[1]['city']] = 0
+            # print(0)
+    print("My clustering coefficients for each node: ", clustering_coeff_for_nodes)
+    print("My clustering coefficient (average): ", avg / graph.number_of_nodes())
 
 
 with open('dpc-covid19-ita-province.json') as f:
@@ -112,9 +116,10 @@ P = construct_graph(json_provinces, D1)
 # R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
 
 # floyd_warshall(P)
-print("Clustering coefficient nx: ", nx.clustering(P))
-print("Clustering coefficient nx: ", nx.average_clustering(P))
+print("Clustering coefficient nx (per ogni nodo): ", nx.clustering(P))
 clustering_coefficient(P)
+
+print("Clustering coefficient nx (media): ", nx.average_clustering(P))
 
 # floyd_warshall(R)
 # to draw graph. TODO:use graphviz
