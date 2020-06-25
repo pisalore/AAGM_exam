@@ -81,31 +81,42 @@ def floyd_warshall(graph):
                 adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
     print(adj_matrix)
 
+
 # global clustering coefficient
-def clustering_coefficient(graph, trials):
-    n = len(graph)
-    triangles = 0
-    nodes = graph.nodes()
-    for i in [int(random.random() * n) for i in range(trials)]:
-        nbrs = list(graph[nodes[i]])
-        if len(nbrs) < 2:
-            continue
-        u, v = random.sample(nbrs, 2)
-        if u in graph[v]:
-            triangles += 1
-    return triangles / float(trials)
+def clustering_coefficient(graph):
+    avg = 0
+    for node in graph.nodes():
+        neighbours = [n for n in nx.neighbors(graph, node)]
+        n_neighbors = len(neighbours)
+        n_links = 0
+        if n_neighbors > 1:
+            for node1 in neighbours:
+                for node2 in neighbours:
+                    if graph.has_edge(node1, node2):
+                        n_links += 1
+            n_links /= 2  # because n_links is calculated twice
+            c = n_links / (0.5 * n_neighbors * (n_neighbors - 1))
+            avg += c
+            print(c)
+        else:
+            print(0)
+    print("My clustering coefficient: ", avg / graph.number_of_nodes())
 
 
 with open('dpc-covid19-ita-province.json') as f:
     json_provinces = json.load(f)
 
 print('P')
-# P = construct_graph(json_provinces, D1)
+P = construct_graph(json_provinces, D1)
 # print('R')
-R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
+# R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
 
 # floyd_warshall(P)
-floyd_warshall(R)
+print("Clustering coefficient nx: ", nx.clustering(P))
+print("Clustering coefficient nx: ", nx.average_clustering(P))
+clustering_coefficient(P)
+
+# floyd_warshall(R)
 # to draw graph. TODO:use graphviz
 # nx.draw(P)
 # plt.show()
