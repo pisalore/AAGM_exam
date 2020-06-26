@@ -118,8 +118,8 @@ def main():
 
     print('Construct provinces graph...')
     P = construct_graph(json_provinces, D1)
-    print('Construct random nodes graph with', R_NUM_NODES, 'nodes...')
-    R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
+    # print('Construct random nodes graph with', R_NUM_NODES, 'nodes...')
+    # R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
 
     print("Run Floyd-Warshall algorithm...")
     floyd_warshall(P)
