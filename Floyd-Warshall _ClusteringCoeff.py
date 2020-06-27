@@ -3,6 +3,7 @@ import networkx as nx
 import random
 import pylab as plt
 import math
+from bisect import bisect_left
 
 # CONSTANTS
 D1 = 0.8
@@ -18,6 +19,20 @@ def euclidean_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
 
+def find_closest_value(ordered_list, target):
+    pos = bisect_left(ordered_list, target)
+    if pos == 0:
+        return 0
+    if pos == len(ordered_list):
+        return ordered_list.index(ordered_list[-1])
+    before = ordered_list[pos - 1]
+    after = ordered_list[pos]
+    if after - target < target - before:
+        return ordered_list.index(after)
+    else:
+        return ordered_list.index(before)
+
+
 def cast_dict_to_list(dictionary):
     dict_list = []
     for key, value in dictionary.items():
@@ -29,19 +44,21 @@ def cast_dict_to_list(dictionary):
 # ref_value is the point (city) we want to find near points
 # dictionary is the sorted points list
 # d is used to define search criteria
-def binary_search(key, ref_value, dictionary, dictionary_list, d, axis):
-    point_inf, point_sup = ref_value[axis] - d, ref_value[axis] + d
-    near_cities = []
+def binary_search(dictionary_list, d, sorted_1d_coord):
+    all_near_cities = []
+    for i in range(len(sorted_1d_coord)):
+        near_cities = []
+        index_inf, index_sup = find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d), \
+                               find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d) + 1
+        near_cities.append(dictionary_list[i][0])
+        near_cities.append(dictionary_list[i][1]['city'])
+        near_cities.append(dictionary_list[index_inf: index_sup])
+        all_near_cities.append(near_cities)
 
-    res_key_point_inf, res_val_point_inf = min(dictionary.items(), key=lambda x: abs(point_inf - x[1][axis]))
-    res_key_point_sup, res_val_point_sup = min(dictionary.items(), key=lambda x: abs(point_sup - x[1][axis]))
-
-    index_inf = dictionary_list.index([res_key_point_inf, res_val_point_inf])
-    index_sup = dictionary_list.index([res_key_point_sup, res_val_point_sup]) + 1
-    near_cities.append(dictionary_list[index_inf: index_sup])
-    near_cities.append(ref_value['city'])
-    near_cities.append(key)
-    return near_cities
+    # O(n)
+    # res_key_point_inf, res_val_point_inf = min(dictionary.items(), key=lambda x: abs(point_inf - x[1][axis]))
+    # res_key_point_sup, res_val_point_sup = min(dictionary.items(), key=lambda x: abs( - x[1][axis]))
+    return all_near_cities
 
 
 # Construct provinces graph from a json provinces file
@@ -100,34 +117,35 @@ def set_random_graph_edges_expensive(graph, threshold):
 
 def set_provinces_edges_binary_search(graph, threshold):
     graph_dict = dict(graph.nodes)
-    near_cities_x = []
-    near_cities_y = []
+    bisect_x = []
+    bisect_y = []
     result = []
     # sort by long and lat
+
     sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
     sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
     # get list nodes representation to search near cities to one given
     dict_list_x, dict_list_y = cast_dict_to_list(sorted_x), cast_dict_to_list(sorted_y)
+    # generate x and y separated coords list in order to compute binary search
+    for i in range(len(graph_dict)):
+        bisect_x.append(dict_list_x[i][1]['long'])
+        bisect_y.append(dict_list_y[i][1]['lat'])
 
-    # get near cities by x and y
-    for k, v in sorted_x.items():
-        x = binary_search(k, v, sorted_x, dict_list_x, threshold, 'long')
-        near_cities_x.append(x)
-    for k, v in sorted_y.items():
-        y = binary_search(k, v, sorted_y, dict_list_y, threshold, 'lat')
-        near_cities_y.append(y)
+    closest_x = binary_search(dict_list_x, threshold, bisect_x)
+    closest_y = binary_search(dict_list_y, threshold, bisect_y)
 
     # sort result by province codes in order to compute intersection
-    near_cities_x.sort(key=lambda x_long: x_long[-1])
-    near_cities_y.sort(key=lambda y_lat: y_lat[-1])
+    closest_x.sort(key=lambda x_long: x_long[0])
+    closest_y.sort(key=lambda y_lat: y_lat[0])
 
     # compute intersections
     for i in range(len(graph_dict)):
-        c = [x for x in near_cities_x[i][0] if x in near_cities_y[i][0]]
-        result.append((c))
-        print('Near cities for', near_cities_x[i][1], c)
+        print(i)
+        c = [x for x in closest_x[i][2] if x in closest_y[i][2]]
+        result.append(c)
+        # print('Near cities for', near_cities_x[i][1], c)
 
-    print('finish')
+    print(result)
 
 
 # Floyd-Warshall Algorithm
