@@ -18,6 +18,28 @@ def euclidean_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
 
+def cast_dict_to_list(dictionary):
+    dict_list = []
+    for key, value in dictionary.items():
+        temp = [key, value]
+        dict_list.append(temp)
+    return dict_list
+
+
+# ref_value is the point (city) we want to find near points
+# dictionary is the sorted points list
+# d is used to define search criteria
+def binary_search(ref_value, dictionary, dictionary_list, d):
+    x_inf, x_sup = ref_value['long'] - d, ref_value['long'] + d
+
+    res_key_x_inf, res_val_x_inf = min(dictionary.items(), key=lambda x: abs(x_inf - x[1]['long']))
+    res_key_x_sup, res_val_x_sup = min(dictionary.items(), key=lambda x: abs(x_sup - x[1]['long']))
+    #
+    index_inf = dictionary_list.index([res_key_x_inf, res_val_x_inf])
+    index_sup = dictionary_list.index([res_key_x_sup, res_val_x_sup])
+    return dictionary_list[index_inf: index_sup]
+
+
 # Construct provinces graph from a json provinces file
 def construct_provinces_graph(provinces):
     # Provinces graph
@@ -74,9 +96,20 @@ def set_random_graph_edges_expensive(graph, threshold):
 
 def set_provinces_edges_binary_search(graph, threshold):
     graph_dict = dict(graph.nodes)
+    near_cities_x = []
+    near_cities_y = []
     # sort by long and lat
     sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
     sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
+    # get list nodes representation to search near cities to one given
+    dict_list_x, dict_list_y = cast_dict_to_list(sorted_x), cast_dict_to_list(sorted_y)
+
+    for k, v in sorted_x.items():
+        x = binary_search(v, sorted_x, dict_list_x, threshold)
+        near_cities_x.append(x)
+    for k, v in sorted_y.items():
+        y = binary_search(v, sorted_y, dict_list_y, threshold)
+        near_cities_y.append(y)
 
     print(graph_dict)
 
