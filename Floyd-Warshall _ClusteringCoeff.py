@@ -29,15 +29,15 @@ def cast_dict_to_list(dictionary):
 # ref_value is the point (city) we want to find near points
 # dictionary is the sorted points list
 # d is used to define search criteria
-def binary_search(key, ref_value, dictionary, dictionary_list, d):
-    x_inf, x_sup = ref_value['long'] - d, ref_value['long'] + d
+def binary_search(key, ref_value, dictionary, dictionary_list, d, axis):
+    point_inf, point_sup = ref_value[axis] - d, ref_value[axis] + d
     near_cities = []
 
-    res_key_x_inf, res_val_x_inf = min(dictionary.items(), key=lambda x: abs(x_inf - x[1]['long']))
-    res_key_x_sup, res_val_x_sup = min(dictionary.items(), key=lambda x: abs(x_sup - x[1]['long']))
-    #
-    index_inf = dictionary_list.index([res_key_x_inf, res_val_x_inf])
-    index_sup = dictionary_list.index([res_key_x_sup, res_val_x_sup])
+    res_key_point_inf, res_val_point_inf = min(dictionary.items(), key=lambda x: abs(point_inf - x[1][axis]))
+    res_key_point_sup, res_val_point_sup = min(dictionary.items(), key=lambda x: abs(point_sup - x[1][axis]))
+
+    index_inf = dictionary_list.index([res_key_point_inf, res_val_point_inf])
+    index_sup = dictionary_list.index([res_key_point_sup, res_val_point_sup]) + 1
     near_cities.append(dictionary_list[index_inf: index_sup])
     near_cities.append(ref_value['city'])
     near_cities.append(key)
@@ -102,6 +102,7 @@ def set_provinces_edges_binary_search(graph, threshold):
     graph_dict = dict(graph.nodes)
     near_cities_x = []
     near_cities_y = []
+    result = []
     # sort by long and lat
     sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
     sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
@@ -110,17 +111,23 @@ def set_provinces_edges_binary_search(graph, threshold):
 
     # get near cities by x and y
     for k, v in sorted_x.items():
-        x = binary_search(k, v, sorted_x, dict_list_x, threshold)
+        x = binary_search(k, v, sorted_x, dict_list_x, threshold, 'long')
         near_cities_x.append(x)
     for k, v in sorted_y.items():
-        y = binary_search(k, v, sorted_y, dict_list_y, threshold)
+        y = binary_search(k, v, sorted_y, dict_list_y, threshold, 'lat')
         near_cities_y.append(y)
 
     # sort result by province codes in order to compute intersection
     near_cities_x.sort(key=lambda x_long: x_long[-1])
     near_cities_y.sort(key=lambda y_lat: y_lat[-1])
 
-    print(graph_dict)
+    # compute intersections
+    for i in range(len(graph_dict)):
+        c = [x for x in near_cities_x[i][0] if x in near_cities_y[i][0]]
+        result.append((c))
+        print('Near cities for', near_cities_x[i][1], c)
+
+    print('finish')
 
 
 # Floyd-Warshall Algorithm
