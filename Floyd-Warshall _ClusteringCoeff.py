@@ -36,6 +36,14 @@ def construct_provinces_graph(provinces):
     return graph
 
 
+# Construct a random  graph of "nodes_num" nodes add edges if edge criteria is satisfied
+def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
+    graph = nx.Graph()
+    for node_id in range(nodes_num):
+        graph.add_node(node_id, x=random.uniform(x_inf, x_sup), y=random.uniform(y_inf, y_sup))
+    return graph
+
+
 # add edges if edge near criteria is satisfied
 def set_provinces_edges_expensive(graph, threshold):
     index = 0
@@ -48,18 +56,10 @@ def set_provinces_edges_expensive(graph, threshold):
                                weight=euclidean_distance(a[1]['long'], a[1]['lat'], b[1]['long'], b[1]['lat']))
                 print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
-
     return graph
 
 
-# Construct a random  graph of "nodes_num" nodes add edges if edge criteria is satisfied
-def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
-    graph = nx.Graph()
-    for node_id in range(nodes_num):
-        graph.add_node(node_id, x=random.uniform(x_inf, x_sup), y=random.uniform(y_inf, y_sup))
-    return graph
-
-
+# add edges if edge near criteria is satisfied
 def set_random_graph_edges_expensive(graph, threshold):
     index = 0
     for a in graph.nodes(data=True):
@@ -69,6 +69,16 @@ def set_random_graph_edges_expensive(graph, threshold):
                     and (a[1]['y'] - threshold < b[1]['y'] < a[1]['y'] + threshold):
                 graph.add_edge(a[0], b[0], weight=euclidean_distance(a[1]['x'], a[1]['y'], b[1]['x'], b[1]['y']))
                 print(' x: ', a[1]['x'], 'y: ', a[1]['y'], ' x: ', b[1]['x'], 'y: ', b[1]['y'])
+    return graph
+
+
+def set_provinces_edges_binary_search(graph, threshold):
+    graph_dict = dict(graph.nodes)
+    # sort by long and lat
+    sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
+    sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
+
+    print(graph_dict)
 
 
 # Floyd-Warshall Algorithm
@@ -126,11 +136,12 @@ def main():
 
     print('Construct provinces graph...')
     P = construct_provinces_graph(json_provinces)
-    set_provinces_edges_expensive(P, D1)
+    P = set_provinces_edges_expensive(P, D1)
+    set_provinces_edges_binary_search(P, D1)
 
     # print('Construct random nodes graph with', R_NUM_NODES, 'nodes...')
     # R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
-    # set_random_graph_edges_expensive(R)
+    # R = set_random_graph_edges_expensive(R)
 
     print("Run Floyd-Warshall algorithm...")
     shortest_graph_paths = floyd_warshall(P)
