@@ -18,8 +18,8 @@ def euclidean_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
 
-# Construct provinces graph from a json provinces file, add edges if edge criteria is satisfied
-def construct_graph(provinces, threshold):
+# Construct provinces graph from a json provinces file
+def construct_provinces_graph(provinces):
     # Provinces graph
     graph = nx.Graph()
     # filter reference date
@@ -33,6 +33,11 @@ def construct_graph(provinces, threshold):
             province_id += 1
         else:
             break
+    return graph
+
+
+# add edges if edge near criteria is satisfied
+def set_provinces_edges_expensive(graph, threshold):
     index = 0
     for a in graph.nodes(data=True):
         index += 1
@@ -52,6 +57,10 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
     graph = nx.Graph()
     for node_id in range(nodes_num):
         graph.add_node(node_id, x=random.uniform(x_inf, x_sup), y=random.uniform(y_inf, y_sup))
+    return graph
+
+
+def set_random_graph_edges_expensive(graph, threshold):
     index = 0
     for a in graph.nodes(data=True):
         index += 1
@@ -60,8 +69,6 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
                     and (a[1]['y'] - threshold < b[1]['y'] < a[1]['y'] + threshold):
                 graph.add_edge(a[0], b[0], weight=euclidean_distance(a[1]['x'], a[1]['y'], b[1]['x'], b[1]['y']))
                 print(' x: ', a[1]['x'], 'y: ', a[1]['y'], ' x: ', b[1]['x'], 'y: ', b[1]['y'])
-
-    return graph
 
 
 # Floyd-Warshall Algorithm
@@ -84,6 +91,7 @@ def floyd_warshall(graph):
             for j in range(n):
                 adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
     print(adj_matrix)
+    return adj_matrix
 
 
 # Global and local clustering coefficients
@@ -117,12 +125,15 @@ def main():
         json_provinces = json.load(f)
 
     print('Construct provinces graph...')
-    P = construct_graph(json_provinces, D1)
+    P = construct_provinces_graph(json_provinces)
+    set_provinces_edges_expensive(P, D1)
+
     # print('Construct random nodes graph with', R_NUM_NODES, 'nodes...')
     # R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
+    # set_random_graph_edges_expensive(R)
 
     print("Run Floyd-Warshall algorithm...")
-    floyd_warshall(P)
+    shortest_graph_paths = floyd_warshall(P)
     # floyd_warshall(R)
 
     # nx clustering results (for comparision purposes)
