@@ -29,15 +29,19 @@ def cast_dict_to_list(dictionary):
 # ref_value is the point (city) we want to find near points
 # dictionary is the sorted points list
 # d is used to define search criteria
-def binary_search(ref_value, dictionary, dictionary_list, d):
+def binary_search(key, ref_value, dictionary, dictionary_list, d):
     x_inf, x_sup = ref_value['long'] - d, ref_value['long'] + d
+    near_cities = []
 
     res_key_x_inf, res_val_x_inf = min(dictionary.items(), key=lambda x: abs(x_inf - x[1]['long']))
     res_key_x_sup, res_val_x_sup = min(dictionary.items(), key=lambda x: abs(x_sup - x[1]['long']))
     #
     index_inf = dictionary_list.index([res_key_x_inf, res_val_x_inf])
     index_sup = dictionary_list.index([res_key_x_sup, res_val_x_sup])
-    return dictionary_list[index_inf: index_sup]
+    near_cities.append(dictionary_list[index_inf: index_sup])
+    near_cities.append(ref_value['city'])
+    near_cities.append(key)
+    return near_cities
 
 
 # Construct provinces graph from a json provinces file
@@ -104,12 +108,17 @@ def set_provinces_edges_binary_search(graph, threshold):
     # get list nodes representation to search near cities to one given
     dict_list_x, dict_list_y = cast_dict_to_list(sorted_x), cast_dict_to_list(sorted_y)
 
+    # get near cities by x and y
     for k, v in sorted_x.items():
-        x = binary_search(v, sorted_x, dict_list_x, threshold)
+        x = binary_search(k, v, sorted_x, dict_list_x, threshold)
         near_cities_x.append(x)
     for k, v in sorted_y.items():
-        y = binary_search(v, sorted_y, dict_list_y, threshold)
+        y = binary_search(k, v, sorted_y, dict_list_y, threshold)
         near_cities_y.append(y)
+
+    # sort result by province codes in order to compute intersection
+    near_cities_x.sort(key=lambda x_long: x_long[-1])
+    near_cities_y.sort(key=lambda y_lat: y_lat[-1])
 
     print(graph_dict)
 
