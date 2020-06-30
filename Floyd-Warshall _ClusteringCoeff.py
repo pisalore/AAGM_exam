@@ -35,12 +35,13 @@ def find_closest_value(ordered_list, target, d):
         return ordered_list.index(before)
 
 
-def cast_dict_to_list(dictionary):
-    dict_list = []
+def cast_dict_to_list(dictionary, geo):
+    coords_1d, dict_list = [], []
     for key, value in dictionary.items():
         temp = [key, value]
+        coords_1d.append(temp[1][geo])
         dict_list.append(temp)
-    return dict_list
+    return dict_list, coords_1d
 
 
 # ref_value is the point (city) we want to find near points
@@ -117,19 +118,16 @@ def set_random_graph_edges_expensive(graph, threshold):
 
 def set_provinces_edges_binary_search(graph, threshold):
     graph_dict = dict(graph.nodes)
-    bisect_x, bisect_y = [], []
 
     # sort dict by long (cities) and lat (y)
     sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
     sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
-    # get list nodes representation to search near cities to one given
-    dict_list_x, dict_list_y = cast_dict_to_list(sorted_x), cast_dict_to_list(sorted_y)
-    # generate cities x and y separated coords list in order to compute binary search
-    for i in range(len(graph_dict)):
-        bisect_x.append(dict_list_x[i][1]['long'])
-        bisect_y.append(dict_list_y[i][1]['lat'])
 
-    start_time = time.time()
+    # get list nodes representation to search near cities to one given
+    # and generate cities x and y separated coords list in order to compute binary search
+    dict_list_x, bisect_x = cast_dict_to_list(sorted_x, 'long')
+    dict_list_y, bisect_y = cast_dict_to_list(sorted_y, 'lat')
+
     closest_x = binary_search(dict_list_x, threshold, bisect_x)
     closest_y = binary_search(dict_list_y, threshold, bisect_y)
     closest_x.sort(key=lambda x_long: x_long[0])
@@ -144,9 +142,11 @@ def set_provinces_edges_binary_search(graph, threshold):
                           list(set(closest_x[i][2]).intersection(closest_y[i][2]))]
         if cities_cluster[2]:
             for j in range(len(cities_cluster[2])):
-                graph.add_edge(cities_cluster[0], cities_cluster[2][j], a=cities_cluster[1], b=graph_dict[cities_cluster[2][j]]['city'],
+                graph.add_edge(cities_cluster[0], cities_cluster[2][j], a=cities_cluster[1],
+                               b=graph_dict[cities_cluster[2][j]]['city'],
                                weight=euclidean_distance(graph_dict[i]['long'], graph_dict[i]['lat'],
-                                                        graph_dict[cities_cluster[2][j]]['long'], graph_dict[cities_cluster[2][j]]['lat']))
+                                                         graph_dict[cities_cluster[2][j]]['long'],
+                                                         graph_dict[cities_cluster[2][j]]['lat']))
     # results are ordered by province province_id
     # print(result)
 
