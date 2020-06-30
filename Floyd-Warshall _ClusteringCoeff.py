@@ -13,6 +13,7 @@ R_NUM_NODES = 2000
 INF = 9999
 X_INF, X_SUP = 30, 51
 Y_INF, Y_SUP = 10, 19
+GRAPH_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
 
 # Euclidean distance in order to calculate distances between cities
@@ -35,7 +36,7 @@ def find_closest_value(ordered_list, target, d):
         return ordered_list.index(before)
 
 
-def cast_dict_to_list(dictionary, geo):
+def retrieve_data_dict_to_list(dictionary, geo):
     coords_1d, dict_list = [], []
     for key, value in dictionary.items():
         temp = [key, value]
@@ -44,23 +45,20 @@ def cast_dict_to_list(dictionary, geo):
     return dict_list, coords_1d
 
 
-# ref_value is the point (city) we want to find near points
 # dictionary is the sorted points list
 # d is used to define search criteria
 def binary_search(dictionary_list, d, sorted_1d_coord):
     all_near_cities = []
     for i in range(len(sorted_1d_coord)):
         near_cities = []
-        index_inf, index_sup = find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d, d), \
-                               find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d, d) + 1
+        index_inf, index_sup = \
+            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d, d), \
+            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d, d) + 1
         near_cities.append(dictionary_list[i][0])
         near_cities.append(dictionary_list[i][1])
         near_cities.append([item[0] for item in dictionary_list[index_inf: index_sup]])
         all_near_cities.append(near_cities)
 
-    # O(n)
-    # res_key_point_inf, res_val_point_inf = min(dictionary.items(), key=lambda x: abs(point_inf - x[1][axis]))
-    # res_key_point_sup, res_val_point_sup = min(dictionary.items(), key=lambda x: abs( - x[1][axis]))
     return all_near_cities
 
 
@@ -83,15 +81,16 @@ def construct_provinces_graph(provinces):
 
 
 # Construct a random  graph of "nodes_num" nodes add edges if edge criteria is satisfied
-def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup, threshold):
+def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup):
     graph = nx.Graph()
     for node_id in range(nodes_num):
         graph.add_node(node_id, city='', long=random.uniform(x_inf, x_sup), lat=random.uniform(y_inf, y_sup))
     return graph
 
 
-# add edges if edge near criteria is satisfied
+# add edges if edge near criteria is satisfied O(n^2)
 def set_provinces_edges_expensive(graph, threshold):
+    start_expensive = time.time()
     for a in graph.nodes(data=True):
         for b in graph.nodes(data=True):
             if (a[1]['long'] - threshold < b[1]['long'] < a[1]['long'] + threshold) \
@@ -100,19 +99,7 @@ def set_provinces_edges_expensive(graph, threshold):
                                weight=euclidean_distance(a[1]['long'], a[1]['lat'], b[1]['long'], b[1]['lat']))
                 # print('Città: ' + a[1]['city'] + ' longitudine: ', a[1]['long'], 'latitudine: ', a[1]['lat'],
                 #       'Città: ' + b[1]['city'] + ' longitudine: ', b[1]['long'], 'latitudine: ', b[1]['lat'])
-    return graph
-
-
-# add edges if edge near criteria is satisfied
-def set_random_graph_edges_expensive(graph, threshold):
-    index = 0
-    for a in graph.nodes(data=True):
-        index += 1
-        for b in (n for n in graph.nodes(data=True) if (n[0] > index and n != a)):
-            if (a[1]['x'] - threshold < b[1]['x'] < a[1]['x'] + threshold) \
-                    and (a[1]['y'] - threshold < b[1]['y'] < a[1]['y'] + threshold):
-                graph.add_edge(a[0], b[0], weight=euclidean_distance(a[1]['x'], a[1]['y'], b[1]['x'], b[1]['y']))
-                print(' x: ', a[1]['x'], 'y: ', a[1]['y'], ' x: ', b[1]['x'], 'y: ', b[1]['y'])
+    print('"Expensive method" provinces graph:', time.time() - start_expensive)
     return graph
 
 
@@ -123,20 +110,19 @@ def set_provinces_edges_binary_search(graph, threshold):
     sorted_x = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['long'])}
     sorted_y = {k: v for k, v in sorted(graph_dict.items(), key=lambda item: item[1]['lat'])}
 
-    # get list nodes representation to search near cities to one given
-    # and generate cities x and y separated coords list in order to compute binary search
-    dict_list_x, bisect_x = cast_dict_to_list(sorted_x, 'long')
-    dict_list_y, bisect_y = cast_dict_to_list(sorted_y, 'lat')
+    # get data from dict in list nodes representation to search near cities to one given
+    # and generate cities x and y separated coords lists in order to compute binary search
+    dict_list_x, bisect_x = retrieve_data_dict_to_list(sorted_x, 'long')
+    dict_list_y, bisect_y = retrieve_data_dict_to_list(sorted_y, 'lat')
 
+    # binary search: it returns near cities' codes grouped by id
+    start_binary = time.time()
     closest_x = binary_search(dict_list_x, threshold, bisect_x)
     closest_y = binary_search(dict_list_y, threshold, bisect_y)
     closest_x.sort(key=lambda x_long: x_long[0])
     closest_y.sort(key=lambda y_lat: y_lat[0])
 
-    # sort result by province codes in order to compute intersection
-
-    # compute intersections
-
+    # compute intersections and add edges to graph
     for i in range(len(graph_dict)):
         cities_cluster = [closest_x[i][0], closest_x[i][1],
                           list(set(closest_x[i][2]).intersection(closest_y[i][2]))]
@@ -147,6 +133,7 @@ def set_provinces_edges_binary_search(graph, threshold):
                                weight=euclidean_distance(graph_dict[i]['long'], graph_dict[i]['lat'],
                                                          graph_dict[cities_cluster[2][j]]['long'],
                                                          graph_dict[cities_cluster[2][j]]['lat']))
+    print('"Binary search method":', time.time() - start_binary, '\n')
 
 
 # Floyd-Warshall Algorithm
@@ -161,8 +148,6 @@ def floyd_warshall(graph):
         for j in range(n):
             if i != j and adj_matrix[i][j] == 0:
                 adj_matrix[i][j] = INF
-    print(adj_matrix)
-
     # Core algorithm
     for k in range(n):
         for i in range(n):
@@ -201,39 +186,44 @@ def main():
     # Open JSON file with provinces
     with open('dpc-covid19-ita-province.json') as f:
         json_provinces = json.load(f)
-
-    print('Construct provinces graph...')
+    # Create graphs for experiments
+    print('Construct provinces and random graphs... \n')
+    # P and R are used for expensive edges adding
     P = construct_provinces_graph(json_provinces)
-    # set_provinces_edges_expensive(P, D1)
-    # set_provinces_edges_binary_search(P, D1)
-    # set_provinces_edges_expensive(P, D1)
+    R = construct_random_graph(R_NUM_NODES, X_INF, X_SUP, Y_INF, Y_SUP)
+    # P1, R1 is for binary edges adding
+    P1 = nx.create_empty_copy(P, with_data=True)
+    R1 = nx.create_empty_copy(R, with_data=True)
+    print('Add edges with expensive and binary methods to provinces graphs...')
+    set_provinces_edges_expensive(P, D1)
+    set_provinces_edges_binary_search(P1, D1)
+    print('Add edges with expensive and binary methods to random graphs...')
+    set_provinces_edges_expensive(R, D2)
+    set_provinces_edges_binary_search(R1, D2)
 
-    # print('Construct random nodes graph with', R_NUM_NODES, 'nodes...')
-    R = construct_random_graph(R_NUM_NODES, 30, 51, 10, 19, 0.08)
-    print('assign edges')
-    start1 = time.time()
-    set_provinces_edges_binary_search(P, D1)
-    print('binary:', time.time() - start1)
-    start = time.time()
-    set_provinces_edges_expensive(R, D1)
-    print('expensive:', time.time() - start)
-
-    print("Run Floyd-Warshall algorithm...")
-    # shortest_graph_paths = floyd_warshall(P)
-    # floyd_warshall(R)
-    nx.draw(P)
-    plt.show()
+    # Draw graphs
+    # nx.draw(P)
+    # plt.show()
+    # to draw graph. TODO:use graphviz
 
     # nx clustering results (for comparision purposes)
-    # print("Clustering coefficient nx (for each node): ", nx.clustering(P))
-    # print("Clustering coefficient nx (average): ", nx.average_clustering(P))
-
+    print("Clustering coefficient nx (for each node): ", nx.clustering(P))
+    print("Clustering coefficient nx (average): ", nx.average_clustering(P))
     print("Calculate local and global clustering coefficients...")
-    # clustering_coefficient(P)
-    # clustering_coefficient(R)
+    clustering_coefficient(P)
+    clustering_coefficient(R)
+
+    print("Run Floyd-Warshall algorithm on provinces graph...")
+    shortest_graph_paths = floyd_warshall(P)
+    print('Shortest paths between provinces', shortest_graph_paths, '\n')
+    print('Run Floyd-Warshall algorithm increasing progressively the graph dimension...')
+    for i in range(len(GRAPH_DIMS)):
+        graph = construct_random_graph(GRAPH_DIMS[i], 0, 10, 0, 10)
+        set_provinces_edges_binary_search(graph, D1)
+        start = time.time()
+        floyd_warshall(graph)
+        print('Floyd-Warshall algorithm with graph dim:', GRAPH_DIMS[i], '--->', time.time() - start, '\n')
 
 
 if __name__ == "__main__":
     main()
-# floyd_warshall(R)
-# to draw graph. TODO:use graphviz
