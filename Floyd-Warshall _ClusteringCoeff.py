@@ -1,10 +1,10 @@
 import json
 import networkx as nx
 import random
-import pylab as plt
 import math
 from bisect import bisect_left
 import time
+import pygraphviz as pgv
 
 # CONSTANTS
 D1 = 0.8
@@ -153,7 +153,7 @@ def floyd_warshall(graph):
         for i in range(n):
             for j in range(n):
                 adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
-    print(adj_matrix)
+    print(adj_matrix, '\n')
     return adj_matrix
 
 
@@ -201,11 +201,15 @@ def main():
     set_provinces_edges_expensive(R, D2)
     set_provinces_edges_binary_search(R1, D2)
 
+    A = nx.drawing.nx_agraph.to_agraph(P)
+    A.layout(prog='dot')
+    A.draw('test.png')
     # Draw graphs
     # nx.draw(P)
     # plt.show()
     # to draw graph. TODO:use graphviz
 
+    # CLUSTERING COEFFICIENTS
     # nx clustering results (for comparision purposes)
     print("Clustering coefficient nx (for each node): ", nx.clustering(P))
     print("Clustering coefficient nx (average): ", nx.average_clustering(P))
@@ -213,9 +217,9 @@ def main():
     clustering_coefficient(P)
     clustering_coefficient(R)
 
+    # FLOYD-WARSHALL ALGORITHM
     print("Run Floyd-Warshall algorithm on provinces graph...")
-    shortest_graph_paths = floyd_warshall(P)
-    print('Shortest paths between provinces', shortest_graph_paths, '\n')
+    floyd_warshall(P)
     print('Run Floyd-Warshall algorithm increasing progressively the graph dimension...')
     for i in range(len(GRAPH_DIMS)):
         graph = construct_random_graph(GRAPH_DIMS[i], 0, 10, 0, 10)
@@ -223,6 +227,10 @@ def main():
         start = time.time()
         floyd_warshall(graph)
         print('Floyd-Warshall algorithm with graph dim:', GRAPH_DIMS[i], '--->', time.time() - start, '\n')
+    print('Floyd-Warshall algorithm on a 2000 nodes graph...')
+    start = time.time()
+    floyd_warshall(R)
+    print(time.time() - start)
 
 
 if __name__ == "__main__":
