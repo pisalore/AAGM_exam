@@ -40,7 +40,7 @@ def cast_dict_to_list(dictionary, geo):
     for key, value in dictionary.items():
         temp = [key, value]
         coords_1d.append(temp[1][geo])
-        dict_list.append(temp)
+        dict_list.append([temp[0], temp[1]['city']])
     return dict_list, coords_1d
 
 
@@ -54,7 +54,7 @@ def binary_search(dictionary_list, d, sorted_1d_coord):
         index_inf, index_sup = find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d, d), \
                                find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d, d) + 1
         near_cities.append(dictionary_list[i][0])
-        near_cities.append(dictionary_list[i][1]['city'])
+        near_cities.append(dictionary_list[i][1])
         near_cities.append([item[0] for item in dictionary_list[index_inf: index_sup]])
         all_near_cities.append(near_cities)
 
@@ -147,8 +147,6 @@ def set_provinces_edges_binary_search(graph, threshold):
                                weight=euclidean_distance(graph_dict[i]['long'], graph_dict[i]['lat'],
                                                          graph_dict[cities_cluster[2][j]]['long'],
                                                          graph_dict[cities_cluster[2][j]]['lat']))
-    # results are ordered by province province_id
-    # print(result)
 
 
 # Floyd-Warshall Algorithm
@@ -223,8 +221,8 @@ def main():
     print("Run Floyd-Warshall algorithm...")
     # shortest_graph_paths = floyd_warshall(P)
     # floyd_warshall(R)
-    # nx.draw(R)
-    # plt.show()
+    nx.draw(P)
+    plt.show()
 
     # nx clustering results (for comparision purposes)
     # print("Clustering coefficient nx (for each node): ", nx.clustering(P))
