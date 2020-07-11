@@ -17,7 +17,7 @@ X_INF, X_SUP = 30, 51
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
                    1000, 2000, 3000, 4000, 5000, 10000, 20000, 50000]
-GRAPH_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+GRAPHS = []
 
 
 # Euclidean distance in order to calculate distances between cities
@@ -152,6 +152,7 @@ def graph_construction_test():
         graph2 = construct_random_graph(GRAPH_TEST_DIMS[i], 0, 10, 0, 10)
         set_provinces_edges_binary_search(graph2, D1)
         efficient_times.append(time.time() - start2)
+        GRAPHS.append(graph2)
     print("TEST GRAPH CONSTRUCTION TERMINATED. \n")
     fig, ax = plt.subplots(figsize=(20, 10))
     plt.plot(GRAPH_TEST_DIMS, efficient_times, label='Efficient graph construction', color="green")
@@ -251,12 +252,11 @@ def main():
     print("Run Floyd-Warshall algorithm on provinces graph...")
     floyd_warshall(P)
     print('Run Floyd-Warshall algorithm increasing progressively the graph dimension...')
-    for i in range(len(GRAPH_DIMS)):
-        graph = construct_random_graph(GRAPH_DIMS[i], 0, 10, 0, 10)
-        set_provinces_edges_binary_search(graph, D1)
+    for i in range(10):
+        graph = GRAPHS[i]
         start = time.time()
         floyd_warshall(graph)
-        print('Floyd-Warshall algorithm with graph dim:', GRAPH_DIMS[i], '--->', time.time() - start, '\n')
+        print('Floyd-Warshall algorithm with graph dim:', GRAPH_TEST_DIMS[i], '--->', time.time() - start, '\n')
     print('Floyd-Warshall algorithm on a 2000 nodes graph...')
     start = time.time()
     floyd_warshall(R)
