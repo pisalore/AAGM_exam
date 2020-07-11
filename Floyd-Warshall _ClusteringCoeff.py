@@ -213,10 +213,9 @@ def clustering_coefficient(graph):
 def main():
     times = [3.0552, 25.067, 83.72, 196.82, 396.74, 707.23, 1107.05,	1653.53, 2388.47, 3267.17, 25878.69]
     fig, ax = plt.subplots()
-    plt.plot(GRAPH_TEST_DIMS[:11], times, label='Efficient graph construction', color="green")
+    plt.plot(GRAPH_TEST_DIMS[:11], times, color="green")
     ax.set(xlabel='Graph dimensions', ylabel="Elapsed time")
     ax.set_title("Floyd-Warshall algorithm on different dimension graphs")
-    plt.legend(loc="upper left")
     plt.gcf().autofmt_xdate()
     plt.show()
     # Graph cnstruction test
