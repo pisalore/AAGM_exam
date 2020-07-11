@@ -170,19 +170,19 @@ def floyd_warshall(graph):
     n = graph.number_of_nodes()
     # Init a full n*n csc_matrix (from scipy)
     sparse_adj = nx.adjacency_matrix(graph, nodelist=None, weight='weight')
-    # Get a full representation of adjacency matrix and set to INF the distance between not linked cities
-    adj_matrix = sparse_adj.toarray()
+    # Get a full representation of paths matrix and set to INF the distance between not linked cities
+    shortest_paths = sparse_adj.toarray()
     for i in range(n):
         for j in range(n):
-            if i != j and adj_matrix[i][j] == 0:
-                adj_matrix[i][j] = INF
+            if i != j and shortest_paths[i][j] == 0:
+                shortest_paths[i][j] = INF
     # Core algorithm
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
-    print(adj_matrix, '\n')
-    return adj_matrix
+                shortest_paths[i][j] = min(shortest_paths[i][j], shortest_paths[i][k] + shortest_paths[k][j])
+    print(shortest_paths, '\n')
+    return shortest_paths
 
 
 # Global and local clustering coefficients
