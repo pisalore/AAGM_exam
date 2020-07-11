@@ -16,7 +16,7 @@ INF = 9999
 X_INF, X_SUP = 30, 51
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
-                   1000, 2000, 3000, 4000, 5000, 10000, 20000, 50000]
+                   1000, 2000, 3000, 4000, 5000, 10000, 20000]
 GRAPHS = []
 
 
@@ -154,7 +154,7 @@ def graph_construction_test():
         efficient_times.append(time.time() - start2)
         GRAPHS.append(graph2)
     print("TEST GRAPH CONSTRUCTION TERMINATED. \n")
-    fig, ax = plt.subplots(figsize=(20, 10))
+    fig, ax = plt.subplots()
     plt.plot(GRAPH_TEST_DIMS, efficient_times, label='Efficient graph construction', color="green")
     plt.plot(GRAPH_TEST_DIMS, expensive_times, label='Not efficient graph construction', color="red")
     ax.set(xlabel='Graph dimensions', ylabel="Elapsed time")
@@ -211,8 +211,8 @@ def clustering_coefficient(graph):
 
 
 def main():
-    times = [3.0552,	25.067,	83.72, 196.82, 396.74, 707.23, 1107.05,	1653.53, 2388.47, 3267.17, 25878.69]
-    fig, ax = plt.subplots(figsize=(20, 10))
+    times = [3.0552, 25.067, 83.72, 196.82, 396.74, 707.23, 1107.05,	1653.53, 2388.47, 3267.17, 25878.69]
+    fig, ax = plt.subplots()
     plt.plot(GRAPH_TEST_DIMS[:11], times, label='Efficient graph construction', color="green")
     ax.set(xlabel='Graph dimensions', ylabel="Elapsed time")
     ax.set_title("Floyd-Warshall algorithm on different dimension graphs")
