@@ -4,6 +4,8 @@ import random
 import math
 from bisect import bisect_left
 import time
+import matplotlib.pyplot as plt
+
 import pygraphviz as pgv
 
 # CONSTANTS
@@ -13,6 +15,8 @@ R_NUM_NODES = 2000
 INF = 9999
 X_INF, X_SUP = 30, 51
 Y_INF, Y_SUP = 10, 19
+GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
+                   1000, 2000, 3000, 4000, 5000, 10000, 20000, 50000]
 GRAPH_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
 
@@ -136,6 +140,29 @@ def set_provinces_edges_binary_search(graph, threshold):
     print('"Binary search method":', time.time() - start_binary, '\n')
 
 
+def graph_construction_test():
+    expensive_times, efficient_times = [], []
+    for i in range(len(GRAPH_TEST_DIMS)):
+        print("TESTS GRAPH CONSTRUCTION WITH", GRAPH_TEST_DIMS[i], 'nodes.')
+        start1 = time.time()
+        graph1 = construct_random_graph(GRAPH_TEST_DIMS[i], 0, 10, 0, 10)
+        set_provinces_edges_expensive(graph1, D1)
+        expensive_times.append(time.time() - start1)
+        start2 = time.time()
+        graph2 = construct_random_graph(GRAPH_TEST_DIMS[i], 0, 10, 0, 10)
+        set_provinces_edges_binary_search(graph2, D1)
+        efficient_times.append(time.time() - start2)
+    print("TEST GRAPH CONSTRUCTION TERMINATED. \n")
+    fig, ax = plt.subplots(figsize=(20, 10))
+    plt.plot(GRAPH_TEST_DIMS, efficient_times, label='Efficient graph construction', color="green")
+    plt.plot(GRAPH_TEST_DIMS, expensive_times, label='Not efficient graph construction', color="red")
+    ax.set(xlabel='Graph dimensions', ylabel="Expired time")
+    ax.set_title("Random graph construction tests")
+    plt.legend(loc="upper left")
+    plt.gcf().autofmt_xdate()
+    plt.show()
+
+
 # Floyd-Warshall Algorithm
 def floyd_warshall(graph):
     # nodes number
@@ -183,6 +210,9 @@ def clustering_coefficient(graph):
 
 
 def main():
+    # Graph cnstruction test
+    graph_construction_test()
+
     # Open JSON file with provinces
     with open('dpc-covid19-ita-province.json') as f:
         json_provinces = json.load(f)
