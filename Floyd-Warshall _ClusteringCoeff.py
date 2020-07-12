@@ -152,7 +152,7 @@ def graph_construction_test():
         graph2 = construct_random_graph(GRAPH_TEST_DIMS[i], 0, 10, 0, 10)
         set_provinces_edges_binary_search(graph2, D1)
         efficient_times.append(time.time() - start2)
-        GRAPHS.append(graph2)
+        #GRAPHS.append(graph2)
     print("TEST GRAPH CONSTRUCTION TERMINATED. \n")
     fig, ax = plt.subplots()
     plt.plot(GRAPH_TEST_DIMS, efficient_times, label='Efficient graph construction', color="green")
@@ -261,7 +261,6 @@ def main():
     start = time.time()
     floyd_warshall(R)
     print(time.time() - start)
-
 
 if __name__ == "__main__":
     main()
