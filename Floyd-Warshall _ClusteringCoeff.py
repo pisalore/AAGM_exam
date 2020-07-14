@@ -29,8 +29,8 @@ def truncate(f, n):
 
 # binary search core
 def find_closest_value(ordered_list, target, d):
+    # target = truncate(target, 3)
     pos = bisect_left(ordered_list, target)
-    target = truncate(target, 2)
     if pos == 0:
         return 0
     if pos == len(ordered_list):
@@ -47,7 +47,7 @@ def retrieve_data_dict_to_list(dictionary, geo):
     coords_1d, dict_list = [], []
     for key, value in dictionary.items():
         temp = [key, value]
-        coords_1d.append(truncate(temp[1][geo], 2))
+        coords_1d.append(temp[1][geo]) # truncate(temp[1][geo], 2)
         dict_list.append([temp[0], temp[1]['city']])
     return dict_list, coords_1d
 
