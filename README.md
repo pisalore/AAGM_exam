@@ -1,5 +1,7 @@
 # Advanced Algorithms and Graph Mining Exam
 
+![Italy-COVID19](https://github.com/pisalore/AAGM_exam/blob/master/images/italy.jpg)
+
 In this repo it is collected my project for the AAGM exam, Master Degree at University of Florence, Italy.
 
 Two different works are provided. Both use the covid-19 data made available from Italian Department of Civil Protection
