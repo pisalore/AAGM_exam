@@ -6,8 +6,6 @@ from bisect import bisect_left
 import time
 import matplotlib.pyplot as plt
 
-import pygraphviz as pgv
-
 # CONSTANTS
 D1 = 0.8
 D2 = 0.08
@@ -16,8 +14,8 @@ INF = 9999
 X_INF, X_SUP = 30, 51
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
-                   1000, 2000, 3000, 4000, 5000, 10000, 20000]
-GRAPHS = []
+                   1000, 2000, 3000, 4000, 5000]
+RANDOM_GRAPHS = []
 
 
 # Euclidean distance in order to calculate distances between cities
@@ -152,7 +150,7 @@ def graph_construction_test():
         graph2 = construct_random_graph(GRAPH_TEST_DIMS[i], 0, 10, 0, 10)
         set_provinces_edges_binary_search(graph2, D1)
         efficient_times.append(time.time() - start2)
-        #GRAPHS.append(graph2)
+        RANDOM_GRAPHS.append(graph2)
     print("TEST GRAPH CONSTRUCTION TERMINATED. \n")
     fig, ax = plt.subplots()
     plt.plot(GRAPH_TEST_DIMS, efficient_times, label='Efficient graph construction', color="green")
@@ -211,8 +209,8 @@ def clustering_coefficient(graph):
 
 
 def main():
-    # Graph cnstruction test
-    graph_construction_test()
+    # Graph construction time test
+    # graph_construction_test()
 
     # Open JSON file with provinces
     with open('dpc-covid19-ita-province.json') as f:
@@ -234,11 +232,7 @@ def main():
 
     A = nx.drawing.nx_agraph.to_agraph(P)
     A.layout(prog='dot')
-    A.draw('test.png')
-    # Draw graphs
-    # nx.draw(P)
-    # plt.show()
-    # to draw graph. TODO:use graphviz
+    A.draw('provinces_graph.png')
 
     # CLUSTERING COEFFICIENTS
     # nx clustering results (for comparision purposes)
@@ -253,14 +247,15 @@ def main():
     floyd_warshall(P)
     print('Run Floyd-Warshall algorithm increasing progressively the graph dimension...')
     for i in range(10):
-        graph = GRAPHS[i]
+        graph = RANDOM_GRAPHS[i]
         start = time.time()
         floyd_warshall(graph)
-        print('Floyd-Warshall algorithm with graph dim:', GRAPH_TEST_DIMS[i], '--->', time.time() - start, '\n')
-    print('Floyd-Warshall algorithm on a 2000 nodes graph...')
+        print('Floyd-Warshall algorithm with graph dim:', GRAPH_TEST_DIMS[i], '--->', time.time() - start, 's\n')
+    print('Floyd-Warshall algorithm on a 2000 nodes sparse graph...')
     start = time.time()
     floyd_warshall(R)
     print(time.time() - start)
+
 
 if __name__ == "__main__":
     main()
