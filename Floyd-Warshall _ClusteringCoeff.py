@@ -64,6 +64,8 @@ def binary_search(dictionary_list, d, sorted_1d_coord):
         near_cities.append(dictionary_list[i][0])
         near_cities.append(dictionary_list[i][1])
         near_cities.append([item[0] for item in dictionary_list[index_inf: index_sup]])
+        if near_cities[0] in near_cities[2]:
+            near_cities[2].remove(near_cities[0])
         all_near_cities.append(near_cities)
 
     return all_near_cities
