@@ -30,7 +30,7 @@ def truncate(f, n):
 # binary search core
 def find_closest_value(ordered_list, target, d):
     pos = bisect_left(ordered_list, target)
-    target = round(target, 2)
+    target = truncate(target, 2)
     if pos == 0:
         return 0
     if pos == len(ordered_list):
@@ -59,8 +59,8 @@ def binary_search(dictionary_list, d, sorted_1d_coord):
     for i in range(len(sorted_1d_coord)):
         near_cities = []
         index_inf, index_sup = \
-            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d, d), \
-            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d, d) + 1
+            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] - d, d) + 1, \
+            find_closest_value(sorted_1d_coord, sorted_1d_coord[i] + d, d) - 1
         near_cities.append(dictionary_list[i][0])
         near_cities.append(dictionary_list[i][1])
         near_cities.append([item[0] for item in dictionary_list[index_inf: index_sup]])
