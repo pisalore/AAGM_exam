@@ -11,7 +11,7 @@ D1 = 0.8
 D2 = 0.08
 R_NUM_NODES = 2000
 INF = 9999
-X_INF, X_SUP = 30, 51
+X_INF, X_SUP = 30, 49
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
                    1000, 2000, 3000, 4000, 5000]
@@ -23,9 +23,14 @@ def euclidean_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
 
+def truncate(f, n):
+    return math.floor(f * 10 ** n) / 10 ** n
+
+
 # binary search core
 def find_closest_value(ordered_list, target, d):
     pos = bisect_left(ordered_list, target)
+    target = round(target, 2)
     if pos == 0:
         return 0
     if pos == len(ordered_list):
@@ -42,7 +47,7 @@ def retrieve_data_dict_to_list(dictionary, geo):
     coords_1d, dict_list = [], []
     for key, value in dictionary.items():
         temp = [key, value]
-        coords_1d.append(temp[1][geo])
+        coords_1d.append(truncate(temp[1][geo], 2))
         dict_list.append([temp[0], temp[1]['city']])
     return dict_list, coords_1d
 
@@ -94,10 +99,8 @@ def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup):
 # add edges if edge near criteria is satisfied O(n^2)
 def set_provinces_edges_expensive(graph, threshold):
     start_expensive = time.time()
-    index = 0
     for a in graph.nodes(data=True):
-        index += 1
-        for b in (n for n in graph.nodes(data=True) if (n[0] > index and n != a)):
+        for b in (n for n in graph.nodes(data=True) if (n != a)):
             if (a[1]['long'] - threshold < b[1]['long'] < a[1]['long'] + threshold) \
                     and (a[1]['lat'] - threshold < b[1]['lat'] < a[1]['lat'] + threshold):
                 graph.add_edge(a[0], b[0], a=a[1]['city'], b=b[1]['city'],
@@ -237,10 +240,13 @@ def main():
 
     # CLUSTERING COEFFICIENTS
     # nx clustering results (for comparision purposes)
-    print("Clustering coefficient nx (for each node): ", nx.clustering(P))
-    print("Clustering coefficient nx (average): ", nx.average_clustering(P))
-    print("Calculate local and global clustering coefficients...")
-    clustering_coefficient(P)
+    print("Clustering coefficient nx (for each node) in provinces graph: ", nx.clustering(P))
+    print("Clustering coefficient nx (average) in provinces graph: ", nx.average_clustering(P))
+    print("Calculate local and global clustering coefficients in provinces graph...")
+    clustering_coefficient(P1)
+    print("Clustering coefficient nx (for each node) in random 2000 nodes graph: ", nx.clustering(P1))
+    print("Clustering coefficient nx (average) in in random 2000 nodes graph: ", nx.average_clustering(P1))
+    print("Calculate local and global clustering coefficients in random 2000 nodes graph...")
     clustering_coefficient(R)
 
     # FLOYD-WARSHALL ALGORITHM
