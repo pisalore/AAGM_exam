@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 D1 = 0.8
 D2 = 0.08
 R_NUM_NODES = 2000
-INF = 9999
+INFINITY = 9999
 X_INF, X_SUP = 30, 49
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000]
@@ -88,7 +88,7 @@ def construct_provinces_graph(provinces):
 def construct_random_graph(nodes_num, x_inf, x_sup, y_inf, y_sup):
     graph = nx.Graph()
     for node_id in range(nodes_num):
-        graph.add_node(node_id, city='', long=random.uniform(x_inf, x_sup), lat=random.uniform(y_inf, y_sup))
+        graph.add_node(node_id, city=str(node_id), long=random.uniform(x_inf, x_sup), lat=random.uniform(y_inf, y_sup))
     return graph
 
 
@@ -173,7 +173,7 @@ def floyd_warshall(graph):
     for i in range(n):
         for j in range(n):
             if i != j and shortest_paths[i][j] == 0:
-                shortest_paths[i][j] = INF
+                shortest_paths[i][j] = INFINITY
     # Core algorithm
     for k in range(n):
         for i in range(n):
@@ -200,20 +200,18 @@ def clustering_coefficient(graph):
             c = n_links / (0.5 * n_neighbors * (n_neighbors - 1))
             avg += c
             local_clustering_coefficients_for_nodes[node[1]['city']] = c
-            # print(c)
         else:
             local_clustering_coefficients_for_nodes[node[1]['city']] = 0
-            # print(0)
     print("My clustering coefficients for each node: ", local_clustering_coefficients_for_nodes)
     print("My clustering coefficient (average): ", avg / graph.number_of_nodes())
 
 
 def main():
     # Graph construction time test
-    graph_construction_test()
+    # graph_construction_test()
 
     # Open JSON file with provinces
-    with open('dpc-covid19-ita-province.json') as f:
+    with open('covid19/dpc-covid19-ita-province.json') as f:
         json_provinces = json.load(f)
     # Create graphs for experiments
     print('Construct provinces and random graphs... \n')
@@ -231,19 +229,21 @@ def main():
     set_provinces_edges_binary_search(R1, D2)
 
     A = nx.drawing.nx_agraph.to_agraph(P)
-    A.layout(prog='dot')
-    A.draw('provinces_graph.png')
+    A.layout(prog='neato')
+    A.node_attr.update(color='lightblue')
+    A.edge_attr.update(len='2.0', color='blue')
+    A.draw('images/provinces_graph.png')
 
     # CLUSTERING COEFFICIENTS
     # nx clustering results (for comparision purposes)
-    print("Clustering coefficient nx (for each node) in provinces graph: ", nx.clustering(P))
-    print("Clustering coefficient nx (average) in provinces graph: ", nx.average_clustering(P))
+    print("Clustering coefficient nx (for each node) in provinces graph: ", nx.clustering(P1))
+    print("Clustering coefficient nx (average) in provinces graph: ", nx.average_clustering(P1))
     print("Calculate local and global clustering coefficients in provinces graph...")
     clustering_coefficient(P1)
-    print("Clustering coefficient nx (for each node) in random 2000 nodes graph: ", nx.clustering(P1))
-    print("Clustering coefficient nx (average) in in random 2000 nodes graph: ", nx.average_clustering(P1))
+    print("Clustering coefficient nx (for each node) in random 2000 nodes graph: ", nx.clustering(R1))
+    print("Clustering coefficient nx (average) in in random 2000 nodes graph: ", nx.average_clustering(R1))
     print("Calculate local and global clustering coefficients in random 2000 nodes graph...")
-    clustering_coefficient(R)
+    clustering_coefficient(R1)
 
     # FLOYD-WARSHALL ALGORITHM
     print("Run Floyd-Warshall algorithm on provinces graph...")
