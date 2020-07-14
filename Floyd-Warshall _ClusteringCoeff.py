@@ -13,8 +13,7 @@ R_NUM_NODES = 2000
 INF = 9999
 X_INF, X_SUP = 30, 49
 Y_INF, Y_SUP = 10, 19
-GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900,
-                   1000, 2000, 3000, 4000, 5000]
+GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000]
 RANDOM_GRAPHS = []
 
 
@@ -23,13 +22,8 @@ def euclidean_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
 
-def truncate(f, n):
-    return math.floor(f * 10 ** n) / 10 ** n
-
-
 # binary search core
 def find_closest_value(ordered_list, target, d):
-    # target = truncate(target, 3)
     pos = bisect_left(ordered_list, target)
     if pos == 0:
         return 0
@@ -47,7 +41,7 @@ def retrieve_data_dict_to_list(dictionary, geo):
     coords_1d, dict_list = [], []
     for key, value in dictionary.items():
         temp = [key, value]
-        coords_1d.append(temp[1][geo]) # truncate(temp[1][geo], 2)
+        coords_1d.append(temp[1][geo])
         dict_list.append([temp[0], temp[1]['city']])
     return dict_list, coords_1d
 
@@ -216,7 +210,7 @@ def clustering_coefficient(graph):
 
 def main():
     # Graph construction time test
-    # graph_construction_test()
+    graph_construction_test()
 
     # Open JSON file with provinces
     with open('dpc-covid19-ita-province.json') as f:
@@ -255,11 +249,10 @@ def main():
     print("Run Floyd-Warshall algorithm on provinces graph...")
     floyd_warshall(P)
     print('Run Floyd-Warshall algorithm increasing progressively the graph dimension...')
-    for i in range(10):
-        graph = RANDOM_GRAPHS[i]
+    for graph in RANDOM_GRAPHS:
         start = time.time()
         floyd_warshall(graph)
-        print('Floyd-Warshall algorithm with graph dim:', GRAPH_TEST_DIMS[i], '--->', time.time() - start, 's\n')
+        print('Floyd-Warshall algorithm with graph dim:', graph.number_of_nodes(), '--->', time.time() - start, 's\n')
     print('Floyd-Warshall algorithm on a 2000 nodes sparse graph...')
     start = time.time()
     floyd_warshall(R)
