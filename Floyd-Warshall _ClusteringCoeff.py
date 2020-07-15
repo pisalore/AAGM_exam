@@ -11,7 +11,9 @@ D1 = 0.8
 D2 = 0.08
 R_NUM_NODES = 2000
 INFINITY = 9999
+# x in [30,50)
 X_INF, X_SUP = 30, 49
+# y in [10,20).
 Y_INF, Y_SUP = 10, 19
 GRAPH_TEST_DIMS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000]
 RANDOM_GRAPHS = []
@@ -203,12 +205,12 @@ def clustering_coefficient(graph):
         else:
             local_clustering_coefficients_for_nodes[node[1]['city']] = 0
     print("My clustering coefficients for each node: ", local_clustering_coefficients_for_nodes)
-    print("My clustering coefficient (average): ", avg / graph.number_of_nodes())
+    print("My clustering coefficient (average): ", avg / graph.number_of_nodes(), '\n')
 
 
 def main():
     # Graph construction time test
-    graph_construction_test()
+    # graph_construction_test()
 
     # Open JSON file with provinces
     with open('covid19/dpc-covid19-ita-province.json') as f:
@@ -237,11 +239,11 @@ def main():
     # CLUSTERING COEFFICIENTS
     # nx clustering results (for comparision purposes)
     print("Clustering coefficient nx (for each node) in provinces graph: ", nx.clustering(P1))
-    print("Clustering coefficient nx (average) in provinces graph: ", nx.average_clustering(P1))
+    print("Clustering coefficient nx (average) in provinces graph: ", nx.average_clustering(P1), '\n')
     print("Calculate local and global clustering coefficients in provinces graph...")
     clustering_coefficient(P1)
     print("Clustering coefficient nx (for each node) in random 2000 nodes graph: ", nx.clustering(R1))
-    print("Clustering coefficient nx (average) in in random 2000 nodes graph: ", nx.average_clustering(R1))
+    print("Clustering coefficient nx (average) in in random 2000 nodes graph: ", nx.average_clustering(R1), '\n')
     print("Calculate local and global clustering coefficients in random 2000 nodes graph...")
     clustering_coefficient(R1)
 
