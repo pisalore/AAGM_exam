@@ -2,9 +2,10 @@
 
 ![Italy-COVID19](https://github.com/pisalore/AAGM_exam/blob/master/images/italy.jpg)
 
-In this repo it is collected my project for the AAGM exam, Master Degree at University of Florence, Italy.
+In this repo it is collected my project for the AAGM exam, Master Degree at
+University of Studies of Florence, Italy.
 
-Two different works are provided. Both use the covid-19 data made available from Italian Department of Civil Protection
+Two different works are provided. Both use the COVID-19 data made available from Italian Department of Civil Protection
 in their [GitHub Repo](https://github.com/pcm-dpc/COVID-19)
 
 #### 1. First Part: Building the graph of provinces and running some algorithms
@@ -21,7 +22,7 @@ criteria mentioned above)
 
 #### 2. Second Part: Pandas
 
-The second part of the project concerns the use of Pandas, Matplotlib and other tools for data analysis and vizualization
+The second part of the project concerns the use of Pandas, Matplotlib and other tools for data analysis and visualization
 enjoying Python calculation power. Obviously this data analysis has been made about COVID-19 pandemic in Italy.
-At this link it's possible to visualize the Jupyter Notebook, powered by nbviewr: 
+At this link it's possible to visualize the Jupyter Notebook, powered by nbviewer: 
 [COVID-19 In Italy](https://nbviewer.jupyter.org/github/pisalore/AAGM_exam/blob/master/pandas_exam.ipynb)
