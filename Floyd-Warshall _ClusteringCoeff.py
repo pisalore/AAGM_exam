@@ -210,7 +210,7 @@ def clustering_coefficient(graph):
 
 def main():
     # Graph construction time test
-    # graph_construction_test()
+    graph_construction_test()
 
     # Open JSON file with provinces
     with open('covid19/dpc-covid19-ita-province.json') as f:
