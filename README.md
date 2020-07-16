@@ -26,3 +26,7 @@ The second part of the project concerns the use of Pandas, Matplotlib and other 
 enjoying Python calculation power. Obviously this data analysis has been made about COVID-19 pandemic in Italy.
 At this link it's possible to visualize the Jupyter Notebook, powered by nbviewer: 
 [COVID-19 In Italy](https://nbviewer.jupyter.org/github/pisalore/AAGM_exam/blob/master/pandas_exam.ipynb)
+
+The slides are available in [html format](https://nbviewer.jupyter.org/github/pisalore/AAGM_exam/blob/master/exam_slides.slides.html#/)
+(for PDF, check this repo).
+
