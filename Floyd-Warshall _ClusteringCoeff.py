@@ -210,7 +210,7 @@ def clustering_coefficient(graph):
 
 def main():
     # Graph construction time test
-    # graph_construction_test()
+    graph_construction_test()
 
     # Open JSON file with provinces
     with open('covid19/dpc-covid19-ita-province.json') as f:
@@ -231,7 +231,7 @@ def main():
     set_provinces_edges_binary_search(R1, D2)
 
     A = nx.drawing.nx_agraph.to_agraph(P)
-    A.layout(prog='neato')
+    A.layout(prog="neato")
     A.node_attr.update(color='lightblue')
     A.edge_attr.update(len='2.0', color='blue')
     A.draw('images/provinces_graph.png')
